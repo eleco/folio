@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Folio \u2014 Save for later",
+  "version": "1.0.0",
+  "description": "Save the current page to your private Folio reading list.",
+  "permissions": [
+    "activeTab"
+  ],
+  "action": {
+    "default_title": "Save to Folio"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}
