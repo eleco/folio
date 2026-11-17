@@ -1,7 +1,6 @@
 import {getChatGPTUser} from '../../chatgpt-auth';
-import {getDb} from '../../../db';
-import {links} from '../../../db/schema';
-import {and,eq} from 'drizzle-orm';
+import {env} from 'cloudflare:workers';
+import {ownedLink} from '../../../lib/link-service';
 import {fetchPageHtml} from '../../../lib/page-title';
 import {extractArticle} from '../../../lib/article';
 export const dynamic='force-dynamic';
@@ -12,7 +11,7 @@ export async function POST(req:Request){
  if(req.headers.get('origin')!==new URL(req.url).origin)return json({error:'Invalid origin'},403);
  try{
   const data=await req.json() as {id?:unknown};if(typeof data.id!=='string')return json({error:'Select a saved link.'},400);
-  const [link]=await getDb().select().from(links).where(and(eq(links.id,data.id),eq(links.userId,u.userId)));
+  const link=await ownedLink(env.DB!,data.id,u.userId);
   if(!link)return json({error:'Saved link not found.'},404);
   let html:string|null;
   try{html=await fetchPageHtml(link.url,fetch,true,true);}catch(error){return json({error:error instanceof Error?error.message:'Could not reach the article website.'},422);}

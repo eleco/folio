@@ -119,3 +119,8 @@ export async function fetchPageTitle(raw: string, request: typeof fetch = fetch)
   const html = await fetchPageHtml(raw, request);
   return html ? extractTitle(html) : null;
 }
+
+export async function validatePublicPage(raw:string):Promise<boolean>{
+ const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),5000);
+ try{const url=new URL(raw);return allowedTarget(url)&&await publicHost(url.hostname,controller.signal,fetch);}catch{return false;}finally{clearTimeout(timer);}
+}

@@ -6,6 +6,6 @@ function read(a){$('library').hidden=true;$('reader').hidden=false;const target=
 async function load(){articles=await getArticles();render();}
 $('back').onclick=()=>{$('reader').hidden=true;$('library').hidden=false;};$('search').oninput=render;$('clear').onclick=async()=>{if(confirm('Remove all article downloads from this browser? Your saved links will stay in Folio.')){try{await clearArticles();await load();}catch{$('status').textContent='Could not clear downloads. Please try again.'}}};
 // When online, select the current account before reading device-local data.
-try{if(navigator.onLine){try{const r=await fetch('/api/offline',{cache:'no-store'});if(r.ok&&r.headers.get('content-type')?.includes('application/json')){const d=await r.json();if(d.owner)await setOwner(d.owner);}}catch{}}
+try{if(navigator.onLine){try{const r=await fetch('/api/offline',{cache:'no-store'});if(r.ok&&r.headers.get('content-type')?.includes('application/json')){const d=await r.json();if(d.owner)await setOwner(d.owner);}else if(r.status===401){await setOwner('');}}catch{}}
 await load();const id=new URLSearchParams(location.search).get('id');const selected=articles.find(a=>a.id===id);if(selected)read(selected);
 }catch{$('status').textContent='Device storage is unavailable. Use a normal browser window with storage enabled.';}

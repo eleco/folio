@@ -1,4 +1,4 @@
-const CACHE='folio-offline-shell-v3';
+const CACHE='folio-offline-shell-v4';
 const FILES=['/offline.html','/offline.css','/offline-reader.js','/offline-store.js'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
  const cache=await caches.open(CACHE);

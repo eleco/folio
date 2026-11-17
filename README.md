@@ -1,6 +1,6 @@
 # Folio
 
-Private read-later app and Chrome Manifest V3 extension. Hosted using Sites with per-user D1 storage and ChatGPT sign-in.
+Multi-user read-later app and Chrome Manifest V3 extension. Hosted using Sites with per-user D1 storage and ChatGPT sign-in.
 
 ## Extension
 Download /folio-extension.zip in the app, unzip, and load the folder through chrome://extensions in Developer mode. The toolbar button opens an authenticated same-origin capture window. No bearer secrets are shipped to the client.
@@ -31,8 +31,18 @@ The app targets the Cloudflare Workers runtime via Vinext and uses a D1 binding 
 
 The `.openai/hosting.json` template deliberately excludes the original deployment identity. Register a new Site before publishing a separate instance. The Chrome extension in `extension/background.js` currently targets the original Folio deployment; change `FOLIO` to your own origin when using a separate instance and regenerate `public/folio-extension.zip`.
 
-The current hosted app remains privately accessible. Making this source repository public does not grant access to its users or database.
+The hosted app accepts visitors via ChatGPT sign-in. Reading lists and downloads are private per account; shared article metadata appears only after explicit consent.
 
 ## Regression coverage
 
-The 21-test suite covers extraction, safe URL handling, device storage, automatic download queues, offline reader redirects and installation failures. A Miniflare/workerd test exercises real Cloudflare Request construction to catch unsupported fetch options that Node mocks can miss.
+The 29-test suite covers extraction, safe URL handling, device storage, automatic download queues, offline reader redirects and installation failures. A Miniflare/workerd test exercises real Cloudflare Request construction to catch unsupported fetch options that Node mocks can miss.
+
+## Multi-user MVP
+
+Visitors sign in with ChatGPT. Reading lists, archives and downloads are owner-scoped. Saves start private; existing links are not published by migration. Share to Trending is an explicit action with a confirmation. Removing a share or deleting its link retracts that contribution.
+
+Trending ranks opted-in articles by distinct contributors in the last seven days, breaking ties by recency. It exposes only title, normalized public URL, aggregate count and latest contribution timestamp. Saving an article from Trending creates a private bookmark. Known tracking parameters are stripped; obvious private/token links and non-public DNS destinations are rejected. Users must still share only URLs intended for everyone. Limits: 1,000 saved links per account and 20 currently active contributions made within 24 hours.
+
+Migrations add the shared article catalogue and contributions without altering existing bookmarks. Sites applies them at deployment. On another host, protect the identity headers with trusted authentication; never accept user-provided identity headers directly.
+
+Run `node --experimental-strip-types --test tests/*.test.mjs` and `node node_modules/typescript/bin/tsc --noEmit`. The multiplayer tests run the API service against Miniflare/workerd and real D1, including owner isolation, explicit consent, ranking, duplicate suppression, retraction and contribution limits. Sign-in still needs end-to-end verification with real visitor accounts.

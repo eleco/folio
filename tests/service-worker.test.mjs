@@ -6,7 +6,7 @@ function worker({login=false}={}){
  const handlers={},entries=new Map();let offline=false;
  const cache={put:async(k,v)=>entries.set(k,v.clone()),match:async k=>entries.get(k)?.clone()};
  const scope={location:{origin:'https://folio.test'},addEventListener:(n,f)=>handlers[n]=f,skipWaiting:async()=>{},clients:{claim:async()=>{}}};
- const context={self:scope,URL,Response,AbortController,setTimeout,clearTimeout,caches:{open:async()=>cache,keys:async()=>['folio-offline-shell-v3'],delete:async()=>{}},fetch:async(req,options)=>{
+ const context={self:scope,URL,Response,AbortController,setTimeout,clearTimeout,caches:{open:async()=>cache,keys:async()=>['folio-offline-shell-v4'],delete:async()=>{}},fetch:async(req,options)=>{
   if(offline)throw Error('network offline');
   const path=typeof req==='string'?req:new URL(req.url).pathname;
   // Reproduce production's canonical HTML redirect, which broke v1 installation.
